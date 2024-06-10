@@ -21,6 +21,7 @@ summary = df["summary"].to_list()
 rouge_scorer = evaluate.load('rouge')
 scorer = sbert_scorer.SBERT_Scorer()
 
+print("SBERT")
 st = time.time()
 sbert_score, _, __= scorer.compute(summaries=summary, targets=source)
 ed = time.time()
@@ -28,14 +29,12 @@ ed = time.time()
 running_time = ed - st
 df["SBERTScore-P"] = sbert_score
 
-print(f"SBERT Speed: {10066/running_time*60}")
-
 import sys
 sys.path.append("./evaluation_utils/QuestEval")
 from questeval.questeval_metric import QuestEval
 from tqdm import tqdm
 questeval = QuestEval(task="summarization", do_weighter=True)
-
+print("QuestEval")
 st = time.time()
 score = questeval.corpus_questeval(
     hypothesis=summary, 
@@ -51,7 +50,7 @@ import sys
 sys.path.append("./evaluation_utils/summac")
 from summac.model_summac import SummaCZS, SummaCConv
 from tqdm import tqdm
-
+print("SummaCConv")
 model_conv = SummaCConv(models=["vitc"], bins='percentile', granularity="sentence", nli_labels="e", device="cuda", start_file="default", agg="mean")
 
 summac_score = []
@@ -63,13 +62,7 @@ ed = time.time()
 running_time = ed - st
 df["SummaC-Conv"] = summac_score
 
-
-print(f"SummaC-Conv Speed: {10066*60/running_time}")
-
-
-from summac.model_summac import SummaCZS, SummaCConv
-from tqdm import tqdm
-
+print("SummaCZS")
 st = time.time()
 model_conv = SummaCZS(models=["anli"], bins='percentile', granularity="sentence", nli_labels="e", device="cuda", start_file="default", agg="mean", imager_load_cache=False)
 
