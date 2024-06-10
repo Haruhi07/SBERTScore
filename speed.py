@@ -3,14 +3,13 @@ import json
 import time
 import pandas as pd
 import evaluate
+from bert_score import BERTScorer
 from evaluation_utils import sbert_scorer
 
 result_dir = "results.json"
 evaluation_models_dir = "eval_ckpt"
 summary_dir = "generated_summaries"
 metric_list = ["ROUGE-1-F", "ROUGE-2-F", "ROUGE-L-F", "SBERTScore-P"]
-summarisers_to_eval = "margin-bart-large-cnn"
-summary_file_suffix = ".json" # {"id": id, "summary": summary}
 
 df = pd.read_csv('aggre_fact_final_main-100.csv')
 df = df[:1000]
@@ -20,6 +19,14 @@ summary = df["summary"].to_list()
 
 rouge_scorer = evaluate.load('rouge')
 scorer = sbert_scorer.SBERT_Scorer()
+bert_scorer = BERTScorer(lang='en')
+
+print("BERT")
+st = time.time()
+bert_score, _, __= bert_scorer.score(summary, source, batch_size=1)
+ed = time.time()
+running_time = ed - st
+print(running_time)
 
 print("SBERT")
 st = time.time()
